@@ -1,0 +1,30 @@
+<?php
+include 'id_manager.php';
+
+// Funció per insertar una nova reserva
+function insertarReserva($id_desti, $fecha_reserva, $nom_titular) {
+    $connexio = conectarBD();
+    $nouID = obtenirIDMinim($connexio);
+    $consulta = $connexio->prepare('INSERT INTO reserva (id, id_desti, fecha_reserva, nom_titular) VALUES (:id, :id_desti, :fecha_reserva, :nom_titular)');
+    $consulta->bindParam(':id', $nouID, PDO::PARAM_INT);
+    $consulta->bindParam(':id_desti', $id_desti, PDO::PARAM_INT);
+    $consulta->bindParam(':fecha_reserva', $fecha_reserva, PDO::PARAM_STR);
+    $consulta->bindParam(':nom_titular', $nom_titular, PDO::PARAM_STR);
+    $consulta->execute();
+}
+
+// Funció per obtenir totes les reserves
+function obtenirReserves() {
+    $connexio = conectarBD();
+    $consulta = $connexio->prepare('SELECT * FROM reserva');
+    $consulta->execute();
+    return $consulta->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Funció per eliminar una reserva
+if (isset($_POST['eliminarReserva'])) {
+    $id = arreglarDades($_POST['id']);
+    eliminarReserva(conectarBD(), $id);
+    reajustarIDs(conectarBD());
+}
+?>
